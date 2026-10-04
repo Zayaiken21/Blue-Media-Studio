@@ -1,33 +1,31 @@
-# Blue Media Studio
+# Blue Media Studio Pro
 
-Static, GitHub Pages-ready progressive web app for:
+A static, GitHub Pages-ready media PWA that uses real browser media APIs.
 
-- Microphone recording with live level meter
-- Direct WAV export
-- Common audio conversion through FFmpeg WebAssembly loaded on demand
-- Audio import, trim, gain, fade, normalize and reverse
-- Video/media preview, trim and conversion
-- Audio extraction from video
-- Voice modifying with pitch, EQ, compression, reverb and echo
-- Add to Home Screen / PWA support
-- Responsive layouts with iPhone safe-area support
+## Real microphone path
+- `navigator.mediaDevices.getUserMedia()` opens the physical microphone.
+- Web Audio `ScriptProcessorNode` captures PCM samples directly.
+- WAV is encoded locally from the captured PCM, independent of MediaRecorder codec support.
+- MediaRecorder is also used when available to preserve a native compressed recording.
+- Device enumeration allows choosing an available audio input after permission is granted.
 
-## Publish on GitHub Pages
+## Real audio editor
+- Files are read with File/Blob APIs and decoded with Web Audio `decodeAudioData()`.
+- WAV/AIFF are rendered from PCM locally.
+- M4A/AAC/WEBM/OGG exports are enabled only if the current browser exposes an encoder.
 
-1. Create a new GitHub repository.
-2. Upload every file and folder from this project to the repository root.
-3. In GitHub: **Settings → Pages**.
-4. Set **Source** to **Deploy from a branch**.
-5. Select `main` and `/ (root)`, then save.
-6. Open the generated `https://USERNAME.github.io/REPOSITORY/` URL.
+## Real voice modifier
+- Uses OfflineAudioContext to render EQ, compression, reverb, echo, gain and pitch/rate effects.
 
-Microphone access requires HTTPS. GitHub Pages provides HTTPS automatically.
+## Real video page
+- Imports an actual local file into a `<video>` element using an object URL.
+- Trim export redraws decoded video frames to a canvas and records that canvas stream with the browser encoder.
+- Audio from the media element is routed into the rendered export when supported.
+- WAV extraction captures decoded audio from the selected video through Web Audio.
+- Save Current Frame exports the current decoded video frame to PNG.
 
-## Install on mobile
+## Important browser limitation
+A static GitHub Pages app cannot ship operating-system codecs that Safari/Chrome themselves do not decode/encode. The file picker therefore allows any file instead of hiding unsupported files, and the app reports codec failures after selection. MP4/H.264/MOV are typically the most reliable video inputs on iPhone; WAV/M4A/AAC/MP3 are the most reliable audio inputs.
 
-- **Android / Chrome:** use the Install button or browser menu → Add to Home screen / Install app.
-- **iPhone / iPad:** open in Safari → Share → Add to Home Screen.
-
-## Important browser limitations
-
-This project is static and performs processing locally. Browser codec support varies. WAV is the most reliable audio export. FFmpeg WebAssembly is loaded from public CDNs only when a conversion requiring it is requested. Very large/4K video files can exceed mobile-browser memory limits.
+## Deploy
+Upload the contents of this folder to the root of a GitHub repository and enable GitHub Pages from the main branch.
